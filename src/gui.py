@@ -1,17 +1,15 @@
 import tkinter
 import time
-
 from tkinter import ttk
 from scapy.all import sniff
 from scapy.arch.windows import get_windows_if_list
 import threading
 from scapy.layers.inet import IP,UDP,TCP,Ether
-# from scapy.layers.l2 import UDP
-
+from ttkbootstrap import Style
 
 #########初始化
 root = tkinter.Tk()
-root.title("Network Sniffer 赵旭 2022E8015082079 ")
+root.title("嗅探器设计与实现 赵旭 2022E8015082079 ")
 root.geometry('1200x700')
 packet_counter = 0
 packet_list = []
@@ -20,17 +18,25 @@ stopFlag  = threading.Event()
 iface_id =''
 ifaces = get_windows_if_list()
 iface_details = []
+iface_name = []
 for iface in ifaces:
-    iface_details.append((iface['name']))
+    iface_details.append((iface['description']))
+    iface_name.append(iface['name'])
 
+style = Style(theme='flatly')
 
 
 #########回调函数
 def start_sniffing():
-    global current_packet, stopFlag
+    global  stopFlag
     stopFlag.clear()
     start_button.configure(state="disabled")
     stop_button.configure(state="normal")
+    newt = threading.Thread(target=sniff_thread)
+    newt.start()
+
+def sniff_thread():
+    global current_packet
     brf_str=brf_entry.get()
     print(brf_str)
     current_packet = sniff(count=0, 
@@ -41,15 +47,12 @@ def start_sniffing():
                         )
 
 
-
-
 def stop_sniffing():
     global current_packet, stopFlag
     stopFlag.set()
     stop_button.configure(state="disabled")
     start_button.configure(state="normal")
     current_packet = None
-
 
 def process_packet(packet):
     global packet_counter, tree
@@ -96,6 +99,7 @@ def process_packet(packet):
     ]
     tree.insert("", tkinter.END, values=row_data)
     tree.update()  
+    tree.yview_moveto(1)
     # root.update()
 
 def button_clear():
@@ -114,16 +118,18 @@ def show_packet_info(event):
 
 def on_select(event):
     global iface_id
-    iface_id=combobox.get()
+    iface_des=combobox.get()
+    iface_id=iface_name[iface_details.index(iface_des)]
 
 
 #########GUI
+# ttk.Style().theme_use('clam')
 #########功能部分
 top_frame = tkinter.Frame(root)
 top_frame.pack(side=tkinter.TOP, fill=tkinter.X)
 
-iface_label = tkinter.Label(top_frame, text="网卡列表")
-
+iface_label = ttk.Label(top_frame, text="网卡列表",style='primary.TLabel')
+brf_label = ttk.Label(top_frame, text="BRF规则",style='primary.TLabel')
 
 combobox = ttk.Combobox(top_frame, values=iface_details,width=30)
 combobox.bind("<<ComboboxSelected>>", on_select)
@@ -138,7 +144,8 @@ clear_button = tkinter.Button(top_frame, text="清除列表",command=button_clea
 
 brf_entry = tkinter.Entry(top_frame,width=80 )
 
-brf_entry.pack(side=tkinter.LEFT, padx=5, pady=5)
+brf_label.pack(side=tkinter.LEFT, padx=5, pady=0)
+brf_entry.pack(side=tkinter.LEFT, padx=0, pady=5)
 start_button.pack(side=tkinter.LEFT, padx=5, pady=5)
 stop_button.pack(side=tkinter.LEFT, padx=5, pady=5)
 clear_button.pack(side=tkinter.LEFT, padx=5, pady=5)
@@ -179,7 +186,7 @@ tree.bind("<ButtonRelease-1>", show_packet_info)
 bottom_frame = tkinter.Frame(root)
 bottom_frame.pack(side=tkinter.BOTTOM, fill=tkinter.X)
 
-packet_text = tkinter.Text(bottom_frame, height=20)
+packet_text = tkinter.Text(bottom_frame, height=15)
 packet_text.pack(side=tkinter.LEFT, padx=5, pady=5, fill=tkinter.BOTH, expand=True)
 
 yscrollbar = tkinter.Scrollbar(bottom_frame, command=packet_text.yview)
