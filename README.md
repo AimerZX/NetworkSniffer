@@ -1,9 +1,7 @@
 # NetworkSniffer
-
-C/C++太麻烦 QT、Npcap……
+C/C++太麻烦 QT、Npcap……\
 逐转战Python
-
-####packetlist：
-scapy
-tkinter
+### packetlist：
+scapy\
+tkinter\
 threading
