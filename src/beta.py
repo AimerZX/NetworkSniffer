@@ -84,7 +84,7 @@ def show_packet_info(event):
     selected_item = tree.selection()[0]
     packet_text.delete("1.0", tkinter.END)
     packet_text.insert(tkinter.END, f"Packet {selected_item}\n")
-    packet_text.insert(tkinter.END, f"{tree.item(selected_item)['values'][6]}")
+    packet_text.insert(tkinter.END, f"{tree.item(selected_item)['values'][7]}")
     
 
 top_frame = tkinter.Frame(root)
@@ -104,9 +104,15 @@ middle_frame =  tkinter.Frame(root)
 middle_frame.pack(side= tkinter.TOP, fill= tkinter.BOTH, expand=True)
 
 tree_columns = ("序号", "时间", "源地址", "目标地址", "协议", "长度", "简要信息")
+
 tree = ttk.Treeview(middle_frame, columns=tree_columns, show="headings")
+
+widths =[30,80,80,80,30,30,350]
+
 for col in tree_columns:
     tree.heading(col, text=col)
+for i in range(len(tree_columns)):
+    tree.column(tree_columns[i], width=widths[i])
 
 tree_scrollbar = tkinter.Scrollbar(middle_frame, orient="vertical", command=tree.yview)
 tree_scrollbar.pack(side="right", fill="y")
