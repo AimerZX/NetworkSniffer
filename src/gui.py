@@ -7,7 +7,7 @@ from scapy.layers.inet import *
 from scapy.layers.l2 import *
 
 root = tkinter.Tk()
-root.title("Network Sniffer")
+root.title("Network Sniffer 赵旭2022E8015082079 ")
 root.geometry('1200x700')
 packet_counter = 0
 packet_list = []
@@ -51,7 +51,6 @@ def process_packet(packet):
         proto=packet[IP].proto
         if proto in protos_ipv4:
             proto=protos_ipv4[proto]
-
     if TCP in packet:
         protos_tcp = {20: 'ftp_data', 21: 'Ftp', 22: 'SSH', 23: 'Telnet', 25: 'SMTP', 80: 'Http', 443: 'Https'}
         sport = packet[TCP].sport
@@ -78,6 +77,11 @@ def process_packet(packet):
     tree.update()  
     # root.update()
 
+def button_clear():
+    global packet_counter
+    tree.delete(*tree.get_children())
+    packet_text.delete("1.0", tkinter.END)
+    packet_counter = 0
 
 def show_packet_info(event):
     global tree, packet_text
@@ -96,7 +100,7 @@ start_button.pack(side=tkinter.LEFT, padx=5, pady=5)
 stop_button = tkinter.Button(top_frame, text="停止抓包", command=stop_sniffing, state="disabled")
 stop_button.pack(side=tkinter.LEFT, padx=5, pady=5)
 
-clear_button = tkinter.Button(top_frame, text="清除")
+clear_button = tkinter.Button(top_frame, text="清除列表",command=button_clear)
 clear_button.pack(side=tkinter.LEFT, padx=5, pady=5)
 
 
