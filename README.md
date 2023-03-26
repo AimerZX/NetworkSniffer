@@ -1,7 +1,7 @@
 # NetworkSniffer
-C/C++太麻烦 QT、Npcap……\
-逐转战Python
+使用python编写
 ### packetlist：
 scapy\
 tkinter\
-threading
+threading\
+ttkbootstrap

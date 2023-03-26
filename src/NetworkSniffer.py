@@ -1,7 +1,7 @@
 import tkinter
 import time
 from tkinter import ttk
-from scapy.all import sniff
+from scapy.all import sniff,hexdump
 from scapy.arch.windows import get_windows_if_list
 import threading
 from scapy.layers.inet import IP,UDP,TCP,Ether
@@ -106,6 +106,8 @@ def process_packet(packet):
         if packet[UDP].sport == 53 or packet[UDP].dport == 53:
             proto = 'DNS'
     
+    bin_raw = hexdump(packet, dump=True)
+
     row_data = [
         packet_counter,
         time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(packet.time)),
@@ -114,7 +116,8 @@ def process_packet(packet):
         proto,
         len(packet),
         packet.summary(),
-        packetstr
+        packetstr,
+        bin_raw
     ]
     if packet_flag:
         tree.insert("", tkinter.END, values=row_data)
@@ -140,6 +143,8 @@ def show_packet_info(event):
     packet_text.delete("1.0", tkinter.END)
     packet_text.insert(tkinter.END, f"Packet {selected_item}\n")
     packet_text.insert(tkinter.END, f"{tree.item(selected_item)['values'][7]}")
+    packet_text.insert(tkinter.END, f"二进制原文为：\n")
+    packet_text.insert(tkinter.END, f"{tree.item(selected_item)['values'][8]}")
     
 
 def on_select(event):
@@ -176,7 +181,7 @@ combobox.current(0)
 on_select(None)
 
 proList = ['Any', 'IPv4', 'IPv6', 'ftp_data', 'Ftp', 'SSH', 'Telnet', 'SMTP', 'Http', 
-           'Https', 'ICMP', 'IGMP', 'IP', 'TCP', 'EGP', 'IGP', 'UDP', 'IPv6', 'ESP', 'OSPF']
+           'Https', 'ICMP', 'IGMP', 'IP', 'TCP', 'EGP', 'IGP', 'UDP', 'ESP', 'OSPF']
 
 pro_combobox = ttk.Combobox(top_frame, values=proList,width=10)
 pro_combobox.bind("<<ComboboxSelected>>", pro_select)
